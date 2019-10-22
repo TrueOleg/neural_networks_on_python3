@@ -4,9 +4,9 @@ import sys
 
 class PartyNN(object):
 
-    def __init__(self, learning_rate=0.1):
-        self.weights_0_1 = np.random.normal(0.0, 2 ** -0.5, (2, 3))
-        self.weights_1_2 = np.random.normal(0.0, 1, (1, 2))
+    def __init__(self, learning_rate=0.1, weights_0_1=np.random.normal(0.0, 2 ** -0.5, (2, 3)), weights_1_2=np.random.normal(0.0, 1, (1, 2))):
+        self.weights_0_1 = weights_0_1
+        self.weights_1_2 = weights_1_2
         self.signoid_mapper = np.vectorize(self.sigmoid)
         self.learning_rate = np.array([learning_rate])
 
@@ -57,24 +57,28 @@ train = [
     ([1, 1, 1], 1),
 ]
 
-epochs = 5000
-learning_rate = 0.05
+epochs = 6000
+learning_rate = 0.08
+weights_0_1 = np.array([np.array([-2.96433185,  3.30138467, -2.79926671]),
+                        np.array([2.54509527, -3.15628949,  2.91632079])])
+weights_1_2 = np.array([np.array([-8.81029385,  4.02878413])])
 
-network = PartyNN(learning_rate=learning_rate)
+network = PartyNN(learning_rate=learning_rate,
+                  weights_0_1=weights_0_1, weights_1_2=weights_1_2)
 
 
-for e in range(epochs):
-    inputs_ = []
-    correct_predictions = []
-    for input_stat, correct_predict in train:
-        network.train(np.array(input_stat), correct_predict)
-        inputs_.append(np.array(input_stat))
-        correct_predictions.append(np.array(correct_predict))
+# for e in range(epochs):
+#     inputs_ = []
+#     correct_predictions = []
+#     for input_stat, correct_predict in train:
+#         network.train(np.array(input_stat), correct_predict)
+#         inputs_.append(np.array(input_stat))
+#         correct_predictions.append(np.array(correct_predict))
 
-    train_loss = MSE(network.predict(np.array(inputs_).T),
-                     np.array(correct_predictions))
-    sys.stdout.write("\rProgress: {}, Training loss: {}".format(
-        str(100 * e/float(epochs))[:4], str(train_loss)[:5]))
+#     train_loss = MSE(network.predict(np.array(inputs_).T),
+#                      np.array(correct_predictions))
+#     sys.stdout.write("\rProgress: {}, Training loss: {}".format(
+#         str(100 * e/float(epochs))[:4], str(train_loss)[:5]))
 
 for input_stat, correct_predict in train:
     print("For input: {} the prediction is: {}, expected: {}".format(
@@ -82,3 +86,12 @@ for input_stat, correct_predict in train:
         str(network.predict(np.array(input_stat)) > .5),
         str(correct_predict == 1)
     ))
+
+for input_stat, correct_predict in train:
+    print("For input: {} the prediction is: {}, expected: {}".format(
+        str(input_stat),
+        str(network.predict(np.array(input_stat))),
+        str(correct_predict == 1)
+    ))
+print(network.weights_0_1)
+print(network.weights_1_2)
